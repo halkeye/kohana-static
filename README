@@ -11,3 +11,7 @@ Then in your view:
 echo HTML::script('static/js/main,error.js', NULL, TRUE);
 
 This allows various files to be setup in modules, and then overridden in applications (or other modules)
+
+
+Module supports minify kohana module.
+* http://github.com/zazu/minify
