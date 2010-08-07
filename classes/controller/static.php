@@ -57,7 +57,7 @@ class controller_static extends Controller
         $ext = $info['extension'];
         $filename = $info['filename'];
 
-        $file = Kohana::find_file('views/images', basename($info['basename']), $ext);
+        $file = Kohana::find_file('views/images', basename($info['basename'], ".$ext"), $ext);
         if (!$file)
             throw new Kohana_Exception("No such file or directory (:filename)", array('filename'=>"$filename.$ext"));
 
