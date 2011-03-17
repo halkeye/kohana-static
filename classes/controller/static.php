@@ -16,14 +16,14 @@ class controller_static extends Controller
     {
         if ($filenames === null) 
         {
-            $this->request->response = "/* No $type TO BE FOUND */";
+            $this->response = "/* No $type TO BE FOUND */";
             return;
         }
 
         if (Kohana_Core::$environment != Kohana::DEVELOPMENT && self::check(300) === FALSE) self::set(300);
 
-        $this->request->headers['Content-Type']        = File::mime_by_ext($type);
-        $this->request->response = "";
+        $this->response->headers('Content-Type',File::mime_by_ext($type));
+        $body = "";
         $filenames = preg_replace("/\.$type\$/", '', $filenames);
         foreach (explode(',', $filenames) as $key)
         {
@@ -31,19 +31,20 @@ class controller_static extends Controller
             $file = Kohana::find_file('views/'.$type, $key, $type);
             if (!$file)
             {
-                $this->request->response .= "/* No such file or directory ($key.$type) */\n";
+                $body .= "/* No such file or directory ($key.$type) */\n";
                 continue;
             }
 
-            $this->request->response .= implode('', array('/* (', str_replace(DOCROOT, '', $file), ") */\n"));
-            $this->request->response .= file_get_contents($file);
+            $body .= implode('', array('/* (', str_replace(DOCROOT, '', $file), ") */\n"));
+            $body .= file_get_contents($file);
         }
 
         /* Play nice with minify module if its enabled */
         if ( Kohana::config('minify.enabled', false ) && class_exists('Minify')) 
         {
-            $this->request->response = Minify::factory($type)->set($this->request->response)->min();
+            $body = Minify::factory($type)->set($body)->min();
         }
+        $this->response->body($body);
     }
 
     public function action_img($filename = null)
@@ -61,7 +62,7 @@ class controller_static extends Controller
         if (!$file)
             throw new Kohana_Exception("No such file or directory (:filename)", array('filename'=>"$filename.$ext"));
 
-        $this->request->send_file($file, FALSE, array('inline' => 1, 'mime_type' => File::mime_by_ext($ext)));
+        $this->response->send_file($file, FALSE, array('inline' => 1, 'mime_type' => File::mime_by_ext($ext)));
     }
     
     /* The following is borrowed from kohana v2 code */
