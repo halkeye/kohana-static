@@ -14,6 +14,11 @@ class controller_static extends Controller
 
     private function handleStatic($filenames, $type) 
     {
+        /* Fix to prevent debug bar from rendering on this page */
+		$config = Kohana::config('debug_toolbar');
+        if ($config) { $config->set('auto_render', false); }
+        /* end fix */
+
         if ($filenames === null) 
         {
             $this->response = "/* No $type TO BE FOUND */";
